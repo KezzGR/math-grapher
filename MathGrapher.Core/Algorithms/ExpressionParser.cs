@@ -122,7 +122,14 @@ namespace MathGrapher.Core.Algorithms
                 }
                 else if (Precedance.ContainsKey(c))
                 {
-                    if (c == '-' && (i == 0 || expression[i - 1] == '(' || Precedance.ContainsKey(expression[i - 1])))
+                    int previousIndex = i - 1;
+
+                    while (previousIndex >= 0 && char.IsWhiteSpace(expression[previousIndex]))
+                    {
+                        previousIndex--;
+                    }
+
+                    if (c == '-' && (previousIndex < 0 || expression[previousIndex] == '(' || Precedance.ContainsKey(expression[previousIndex])))
                     {
                         output.Enqueue(Token.Number(-1.0));
                         operators.Push(Token.Operator('*'));

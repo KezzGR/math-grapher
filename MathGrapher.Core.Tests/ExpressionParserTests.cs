@@ -11,6 +11,7 @@ public class ExpressionParserTests
     [InlineData("sin(0)", 0.0, 0.0)]
     [InlineData("x ^ 2", 3.0, 9.0)]
     [InlineData("pi", 0.0, Math.PI)]
+    [InlineData("2 * -3", 0.0, -6.0)]
     public void Evaluate_ValidExpression_ReturnsExpectedResult(string expression, double x, double expected)
     {
         double result = ExpressionParser.Evaluate(expression, x);
