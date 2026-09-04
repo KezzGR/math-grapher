@@ -18,4 +18,12 @@ public class ExpressionParserTests
 
         Assert.Equal(expected, result, precision: 10);
     }
+
+    [Fact]
+    public void Evaluate_MissingOperand_ThrowsArgumentException()
+    {
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => ExpressionParser.Evaluate("2 +", 0.0));
+
+        Assert.Contains("Некорректное выражение", exception.Message);
+    }
 }

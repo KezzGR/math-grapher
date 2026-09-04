@@ -33,18 +33,20 @@ namespace MathGrapher.Core.Algorithms
 
         public static double Evaluate(string expression, double x)
         {
-            Queue<Token> outputQueue;
-
             try
             {
-                outputQueue = ShuntingYard(expression, x);
+                Queue<Token> outputQueue = ShuntingYard(expression, x);
+
+                return EvaluateRPN(outputQueue);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new ArgumentException($"Некорректное выражение: недостаточно операндов.", nameof(expression), ex);
             }
             catch (Exception ex)
             {
-                throw new ArgumentException($"Ошибка парсинга выражения: {ex.Message}", ex);
+                throw new ArgumentException($"Некорректное выражение: {ex.Message}", nameof(expression), ex);
             }
-
-            return EvaluateRPN(outputQueue);
         }
 
         private static Queue<Token> ShuntingYard(string expression, double x)
@@ -138,7 +140,7 @@ namespace MathGrapher.Core.Algorithms
                     {
                         while (operators.Count > 0 && operators.Peek().Type == TokenType.Operator)
                         {
-                            char stackOp = (char)operators.Peek().Value; 
+                            char stackOp = (char)operators.Peek().Value;
                             if (Precedance.TryGetValue(stackOp, out int stackPrec))
                             {
                                 int currPrec = Precedance[c];
