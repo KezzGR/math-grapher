@@ -1,6 +1,5 @@
-﻿using MathGrapher.Core.Data;
-using System.Configuration;
-using System.Data;
+using MathGrapher.Core.Data;
+using System.IO;
 using System.Windows;
 
 namespace MathGrapher
@@ -11,16 +10,13 @@ namespace MathGrapher
         {
             base.OnStartup(e);
 
-            var connectionString = ConfigurationManager.ConnectionStrings["MathGrapherConnection"]?.ConnectionString;
+            string appDataDirectory = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "MathGrapher");
+            Directory.CreateDirectory(appDataDirectory);
 
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                MessageBox.Show("Строка подключения не найдена в App.config", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                Shutdown();
-                return;
-            }
-
-            DatabaseHelper.Initialize(connectionString);
+            DatabaseHelper.Initialize(
+                Path.Combine(appDataDirectory, "history.db"));
         }
     }
 }

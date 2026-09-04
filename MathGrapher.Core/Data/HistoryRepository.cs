@@ -1,40 +1,57 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using Microsoft.Data.SqlClient;
 using MathGrapher.Core.Models;
 
 namespace MathGrapher.Core.Data
 {
     public static class HistoryRepository
     {
-        public static void AddRecord(string expression, double xMin, double xMax, double step, double? area)
+        public static void AddRecord(
+            string expression,
+            double xMin,
+            double xMax,
+            double step,
+            double? area)
         {
-            string sql = @"INSERT INTO GraphHistory (Expression, XMin, XMax, Step, Area) VALUES (@expr, @xMin, @xMax, @step, @area)";
-            DatabaseHelper.ExecuteNonQuery(sql, new SqlParameter("@expr", expression), new SqlParameter("@xMin", xMin),
-                                                new SqlParameter("@xMax", xMax), new SqlParameter("@step", step), new SqlParameter("@area", (object?)area ?? DBNull.Value));
+            using var connection = DatabaseHelper.GetConnection();
+            using var command = connection.CreateCommand();
+            command.CommandText = """
+                INSERT INTO GraphHistory (Expression, XMin, XMax, Step, Area)
+                VALUES ($expression, $xMin, $xMax, $step, $area);
+                """;
+            command.Parameters.AddWithValue("$expression", expression);
+            command.Parameters.AddWithValue("$xMin", xMin);
+            command.Parameters.AddWithValue("$xMax", xMax);
+            command.Parameters.AddWithValue("$step", step);
+            command.Parameters.AddWithValue("$area", (object?)area ?? DBNull.Value);
+            command.ExecuteNonQuery();
         }
 
         public static List<GraphRecord> GetHistory()
         {
-            DataTable table = DatabaseHelper.ExecuteQuery("SELECT * FROM GraphHistory ORDER BY CreatedAt DESC");
+            using var connection = DatabaseHelper.GetConnection();
+            using var command = connection.CreateCommand();
+            command.CommandText = """
+                SELECT Id, Expression, XMin, XMax, Step, Area, CreatedAt
+                FROM GraphHistory
+                ORDER BY CreatedAt DESC, Id DESC;
+                """;
+            using var reader = command.ExecuteReader();
 
-            var list = new List<GraphRecord>();
-            foreach (DataRow row in table.Rows)
+            var records = new List<GraphRecord>();
+            while (reader.Read())
             {
-                list.Add(new GraphRecord
+                records.Add(new GraphRecord
                 {
-                    Id = Convert.ToInt32(row["Id"]),
-                    Expression = row["Expression"].ToString()!,
-                    XMin = Convert.ToDouble(row["XMin"]),
-                    XMax = Convert.ToDouble(row["XMax"]),
-                    Step = Convert.ToDouble(row["Step"]),
-                    Area = row["Area"] == DBNull.Value ? null : Convert.ToDouble(row["Area"]),
-                    CreatedAt = Convert.ToDateTime(row["CreatedAt"])
+                    Id = reader.GetInt32(0),
+                    Expression = reader.GetString(1),
+                    XMin = reader.GetDouble(2),
+                    XMax = reader.GetDouble(3),
+                    Step = reader.GetDouble(4),
+                    Area = reader.IsDBNull(5) ? null : reader.GetDouble(5),
+                    CreatedAt = reader.GetDateTime(6)
                 });
             }
 
-            return list;
+            return records;
         }
     }
 }

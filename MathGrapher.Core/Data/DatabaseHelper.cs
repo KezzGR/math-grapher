@@ -1,6 +1,4 @@
-﻿using System;
-using System.Data;
-using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 
 namespace MathGrapher.Core.Data
 {
@@ -8,54 +6,40 @@ namespace MathGrapher.Core.Data
     {
         private static string? _connectionString;
 
-        public static void Initialize(string connectionString)
+        public static void Initialize(string databasePath)
         {
-            _connectionString = connectionString;
+            _connectionString = new SqliteConnectionStringBuilder
+            {
+                DataSource = databasePath
+            }.ToString();
+
+            using SqliteConnection connection = GetConnection();
+            using SqliteCommand command = connection.CreateCommand();
+            command.CommandText = """
+                CREATE TABLE IF NOT EXISTS GraphHistory (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Expression TEXT NOT NULL,
+                    XMin REAL NOT NULL,
+                    XMax REAL NOT NULL,
+                    Step REAL NOT NULL,
+                    Area REAL NULL,
+                    CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+                """;
+            command.ExecuteNonQuery();
         }
 
-        public static SqlConnection GetConnection()
+        public static SqliteConnection GetConnection()
         {
             if (string.IsNullOrEmpty(_connectionString))
-                throw new InvalidOperationException("Строка подключения не установлена. Вызовите Initialize.");
+            {
+                throw new InvalidOperationException(
+                    "Строка подключения не установлена. Вызовите Initialize.");
+            }
 
-            var connection = new SqlConnection(_connectionString);
+            var connection = new SqliteConnection(_connectionString);
             connection.Open();
             return connection;
-        }
-
-        public static int ExecuteNonQuery(string commandText, params SqlParameter[] parameters)
-        {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-                using (var command = new SqlCommand(commandText, connection))
-                {
-                    if (parameters != null)
-                        command.Parameters.AddRange(parameters);
-
-                    return command.ExecuteNonQuery();
-                }
-            }
-        }
-
-        public static DataTable ExecuteQuery(string commandText, params SqlParameter[] parameters)
-        {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-                using (var command = new SqlCommand(commandText, connection))
-                {
-                    if (parameters != null)
-                        command.Parameters.AddRange(parameters);
-
-                    using (var adapter = new SqlDataAdapter(command))
-                    {
-                        var table = new DataTable();
-                        adapter.Fill(table);
-                        return table;
-                    }
-                }
-            }
         }
     }
 }
