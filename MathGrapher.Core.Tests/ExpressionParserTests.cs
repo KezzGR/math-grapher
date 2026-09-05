@@ -26,4 +26,14 @@ public class ExpressionParserTests
 
         Assert.Contains("Некорректное выражение", exception.Message);
     }
+
+    [Fact]
+    public void Compile_ValidExpression_EvaluatesForMultipleXValues()
+    {
+        Func<double, double> function = ExpressionParser.Compile("x ^ 2 + 1");
+
+        Assert.Equal(1.0, function(0.0), precision: 10);
+        Assert.Equal(5.0, function(2.0), precision: 10);
+        Assert.Equal(10.0, function(-3.0), precision: 10);
+    }
 }
