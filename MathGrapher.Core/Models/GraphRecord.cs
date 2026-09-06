@@ -3,7 +3,7 @@
     public class GraphRecord
     {
         public int Id { get; set; }
-        public string Expression { get; set; }
+        public required string Expression { get; set; }
         public double XMin { get; set; }
         public double XMax { get; set; }
         public double Step { get; set; }
