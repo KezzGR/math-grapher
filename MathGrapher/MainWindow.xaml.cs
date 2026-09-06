@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
 using System.Globalization;
 using OxyPlot;
 using OxyPlot.Series;
@@ -9,170 +7,174 @@ using MathGrapher.Core.Algorithms;
 using MathGrapher.Core.Data;
 using MathGrapher.Core.Models;
 
-namespace MathGrapher
+namespace MathGrapher;
+
+public partial class MainWindow : Window
 {
-    public partial class MainWindow : Window
+    public MainWindow()
     {
-        public MainWindow()
+        InitializeComponent();
+        Loaded += (s, e) => LoadHistory();
+    }
+
+    private void PlotButton_Click(object sender, RoutedEventArgs e)
+    {
+        string formula = FormulaTextBox.Text.Trim();
+
+        if (string.IsNullOrEmpty(formula))
         {
-            InitializeComponent();
-            Loaded += (s, e) => LoadHistory();
+            ShowError("Введите формулу.");
+            return;
         }
 
-        private void PlotButton_Click(object sender, RoutedEventArgs e)
+        if (!TryParseDouble(XMinTextBox.Text, out double xMin, "XMin")) return;
+        if (!TryParseDouble(XMaxTextBox.Text, out double xMax, "XMax")) return;
+        if (!TryParseDouble(StepTextBox.Text, out double step, "Шаг")) return;
+
+        if (xMin >= xMax)
         {
-            string formula = FormulaTextBox.Text.Trim();
+            ShowError("XMin должен быть меньше XMax");
+            return;
+        }
+        if (step <= 0)
+        {
+            ShowError("Шаг должен быть положительным");
+            return;
+        }
 
-            if (string.IsNullOrEmpty(formula))
-            {
-                ShowError("Введите формулу.");
-                return;
-            }
+        List<DataPoint> points = [];
+        Func<double, double> function;
 
-            if (!TryParseDouble(XMinTextBox.Text, out double xMin, "XMin")) return;
-            if (!TryParseDouble(XMaxTextBox.Text, out double xMax, "XMax")) return;
-            if (!TryParseDouble(StepTextBox.Text, out double step, "Шаг")) return;
+        try
+        {
+            function = ExpressionParser.Compile(formula);
 
-            if (xMin >= xMax)
+            for (double x = xMin; x <= xMax; x += step)
             {
-                ShowError("XMin должен быть меньше XMax");
-                return;
-            }
-            if (step <= 0)
-            {
-                ShowError("Шаг должен быть положительным");
-                return;
-            }
+                double y = function(x);
 
-            List<DataPoint> points = new List<DataPoint>();
-            for (double x = xMin; x <= xMax; x+= step)
-            {
-                try
+                if (!double.IsNaN(y) && !double.IsInfinity(y))
                 {
-                    double y = ExpressionParser.Evaluate(formula, x);
-                    if (!double.IsNaN(y) && !double.IsInfinity(y))
-                    {
-                        points.Add(new DataPoint(x, y));
-                    }
-                }
-                catch
-                {
-
+                    points.Add(new DataPoint(x, y));
                 }
             }
-
-            if (points.Count == 0)
-            {
-                ShowError("Нет допустимых точек для построения графика.\nВозможно, функция не определена на всем интервале.");
-                return;
-            }
-
-            PlotModel model = new PlotModel { Title = $"y = {formula}" };
-
-            LineSeries lineSeries = new LineSeries
-            {
-                Title = formula,
-                Color = OxyColors.DodgerBlue,
-                StrokeThickness = 2,
-                MarkerType = MarkerType.None
-            };
-            lineSeries.Points.AddRange(points);
-            model.Series.Add(lineSeries);
-
-            model.Axes.Add(new LinearAxis
-            {
-                Position = AxisPosition.Bottom,
-                Title = "X",
-                Minimum = xMin,
-                Maximum = xMax,
-                PositionAtZeroCrossing = true,
-                AxislineStyle = LineStyle.Solid,
-                AxislineColor = OxyColors.Black,
-                AxislineThickness = 1,
-                TitlePosition = 1.0,
-                AxisTitleDistance = 10
-            });
-
-            model.Axes.Add(new LinearAxis
-            {
-                Position = AxisPosition.Left,
-                Title = "Y",
-                PositionAtZeroCrossing = true,
-                AxislineStyle = LineStyle.Solid,
-                AxislineColor = OxyColors.Black,
-                AxislineThickness = 1,
-                TitlePosition = 1.0,
-                AxisTitleDistance = 10
-            });
-
-            model.PlotAreaBorderThickness = new OxyThickness(0);
-            PlotView.Model = model;
-
-            double? area = null;
-            try
-            {
-                int n = Math.Max(100, (int)((xMax - xMin)/step));
-                Func<double, double> func = x => ExpressionParser.Evaluate(formula, x);
-                area = Integrator.Trapezoidal(func, xMin, xMax, n);
-                StatusTextBlock.Text = $"Готово. Точек: {points.Count}. Площадь ≈ {area:F4}";
-            }
-            catch
-            {
-                StatusTextBlock.Text = $"Готово. Точек: {points.Count}. Площадь не вычислена.";
-            }
-
-            try
-            {
-                HistoryRepository.AddRecord(formula, xMin, xMax, step, area);
-                LoadHistory();
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Ошибка сохранения в базу данных: {ex.Message}");
-            }
         }
-
-        private void HistoryDataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        catch (ArgumentException ex)
         {
-            if (HistoryDataGrid.SelectedItem is GraphRecord record)
-            {
-                FormulaTextBox.Text = record.Expression;
-                XMinTextBox.Text = record.XMin.ToString(CultureInfo.InvariantCulture);
-                XMaxTextBox.Text = record.XMax.ToString(CultureInfo.InvariantCulture);
-                StepTextBox.Text = record.Step.ToString(CultureInfo.InvariantCulture);
-
-                PlotButton_Click(sender, null);
-            }
+            ShowError(ex.Message);
+            return;
         }
 
-        private void LoadHistory()
+        if (points.Count == 0)
         {
-            try
-            {
-                var history = HistoryRepository.GetHistory();
-                HistoryDataGrid.ItemsSource = history;
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Не удалось загрузить историю: {ex.Message}");
-            }
+            ShowError("Нет допустимых точек для построения графика.\nВозможно, функция не определена на всем интервале.");
+            return;
         }
 
-        private bool TryParseDouble(string text, out double value, string fieldName)
+        PlotModel model = new() { Title = $"y = {formula}" };
+
+        LineSeries lineSeries = new()
         {
-            if (!double.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
-            {
-                ShowError($"Неккоректное значение в поле '{fieldName}'. Введите число.");
-                return false;
-            }
+            Title = formula,
+            Color = OxyColors.DodgerBlue,
+            StrokeThickness = 2,
+            MarkerType = MarkerType.None
+        };
+        lineSeries.Points.AddRange(points);
+        model.Series.Add(lineSeries);
 
-            return true;
-        }
-
-        private void ShowError(string message)
+        model.Axes.Add(new LinearAxis
         {
-            MessageBox.Show(message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-            StatusTextBlock.Text = "Ошибка";
+            Position = AxisPosition.Bottom,
+            Title = "X",
+            Minimum = xMin,
+            Maximum = xMax,
+            PositionAtZeroCrossing = true,
+            AxislineStyle = LineStyle.Solid,
+            AxislineColor = OxyColors.Black,
+            AxislineThickness = 1,
+            TitlePosition = 1.0,
+            AxisTitleDistance = 10
+        });
+
+        model.Axes.Add(new LinearAxis
+        {
+            Position = AxisPosition.Left,
+            Title = "Y",
+            PositionAtZeroCrossing = true,
+            AxislineStyle = LineStyle.Solid,
+            AxislineColor = OxyColors.Black,
+            AxislineThickness = 1,
+            TitlePosition = 1.0,
+            AxisTitleDistance = 10
+        });
+
+        model.PlotAreaBorderThickness = new OxyThickness(0);
+        PlotView.Model = model;
+
+        double? area = null;
+        try
+        {
+            int n = Math.Max(100, (int)((xMax - xMin) / step));
+            area = Integrator.Trapezoidal(function, xMin, xMax, n);
+            StatusTextBlock.Text = $"Готово. Точек: {points.Count}. Площадь ≈ {area:F4}";
         }
+        catch
+        {
+            StatusTextBlock.Text = $"Готово. Точек: {points.Count}. Площадь не вычислена.";
+        }
+
+        try
+        {
+            HistoryRepository.AddRecord(formula, xMin, xMax, step, area);
+            LoadHistory();
+        }
+        catch (Exception ex)
+        {
+            ShowError($"Ошибка сохранения в базу данных: {ex.Message}");
+        }
+    }
+
+    private void HistoryDataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (HistoryDataGrid.SelectedItem is GraphRecord record)
+        {
+            FormulaTextBox.Text = record.Expression;
+            XMinTextBox.Text = record.XMin.ToString(CultureInfo.InvariantCulture);
+            XMaxTextBox.Text = record.XMax.ToString(CultureInfo.InvariantCulture);
+            StepTextBox.Text = record.Step.ToString(CultureInfo.InvariantCulture);
+
+            PlotButton_Click(sender, null);
+        }
+    }
+
+    private void LoadHistory()
+    {
+        try
+        {
+            var history = HistoryRepository.GetHistory();
+            HistoryDataGrid.ItemsSource = history;
+        }
+        catch (Exception ex)
+        {
+            ShowError($"Не удалось загрузить историю: {ex.Message}");
+        }
+    }
+
+    private bool TryParseDouble(string text, out double value, string fieldName)
+    {
+        if (!double.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+        {
+            ShowError($"Неккоректное значение в поле '{fieldName}'. Введите число.");
+            return false;
+        }
+
+        return true;
+    }
+
+    private void ShowError(string message)
+    {
+        MessageBox.Show(message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        StatusTextBlock.Text = "Ошибка";
     }
 }
