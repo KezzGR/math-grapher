@@ -47,4 +47,15 @@ public class IntegratorTests
 
         Assert.Contains("не определена", exception.Message);
     }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void Trapezoidal_NonPositiveSubdivisionCount_ThrowsArgumentOutOfRangeException(int n)
+    {
+        ArgumentOutOfRangeException exception = Assert.Throws<ArgumentOutOfRangeException>(
+            () => Integrator.Trapezoidal(x => x, 0.0, 1.0, n));
+
+        Assert.Equal("n", exception.ParamName);
+    }
 }

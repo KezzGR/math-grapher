@@ -4,6 +4,9 @@ public static class Integrator
 {
     public static double Trapezoidal(Func<double, double> f, double a, double b, int n)
     {
+        if (n <= 0)
+            throw new ArgumentOutOfRangeException(nameof(n), n, "Количество разбиений должно быть положительным.");
+
         double h = (b - a) / n;
 
         double startValue = f(a);
