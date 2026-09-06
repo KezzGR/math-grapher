@@ -62,6 +62,7 @@ public partial class MainWindow : Window
 
         List<DataPoint> points = new(pointCount);
         Func<double, double> function;
+        int validPointCount = 0;
 
         try
         {
@@ -78,6 +79,11 @@ public partial class MainWindow : Window
                 if (double.IsFinite(y))
                 {
                     points.Add(new DataPoint(x, y));
+                    validPointCount++;
+                }
+                else
+                {
+                    points.Add(DataPoint.Undefined);
                 }
             }
         }
@@ -87,7 +93,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (points.Count == 0)
+        if (validPointCount == 0)
         {
             ShowError("Нет допустимых точек для построения графика.\nВозможно, функция не определена на всем интервале.");
             return;
@@ -139,11 +145,11 @@ public partial class MainWindow : Window
         {
             int n = Math.Max(100, (int)((xMax - xMin) / step));
             area = Integrator.Trapezoidal(function, xMin, xMax, n);
-            StatusTextBlock.Text = $"Готово. Точек: {points.Count}. Площадь ≈ {area:F4}";
+            StatusTextBlock.Text = $"Готово. Точек: {validPointCount}. Площадь ≈ {area:F4}";
         }
-        catch
+        catch (InvalidOperationException ex)
         {
-            StatusTextBlock.Text = $"Готово. Точек: {points.Count}. Площадь не вычислена.";
+            StatusTextBlock.Text = $"Готово. Точек: {validPointCount}. Площадь не вычислена: {ex.Message}";
         }
 
         try

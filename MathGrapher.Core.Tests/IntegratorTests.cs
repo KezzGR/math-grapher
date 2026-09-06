@@ -29,4 +29,22 @@ public class IntegratorTests
 
         Assert.Equal(25, result, precision: 10);
     }
+
+    [Fact]
+    public void Trapezoidal_FunctionIsNotFinite_ThrowsInvalidOperationException()
+    {
+        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(
+            () => Integrator.Trapezoidal(x => Math.Sqrt(x), -10.0, 10.0, 100));
+
+        Assert.Contains("не определена", exception.Message);
+    }
+
+    [Fact]
+    public void Trapezoidal_FunctionIsNotFiniteInsideInterval_ThrowsInvalidOperationException()
+    {
+        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(
+            () => Integrator.Trapezoidal(x => 1 / x, -1.0, 1.0, 100));
+
+        Assert.Contains("не определена", exception.Message);
+    }
 }
