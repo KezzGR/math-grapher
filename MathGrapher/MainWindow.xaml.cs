@@ -11,6 +11,8 @@ namespace MathGrapher;
 
 public partial class MainWindow : Window
 {
+    private const int MaxPointCount = 50_000;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -31,6 +33,12 @@ public partial class MainWindow : Window
         if (!TryParseDouble(XMaxTextBox.Text, out double xMax, "XMax")) return;
         if (!TryParseDouble(StepTextBox.Text, out double step, "Шаг")) return;
 
+        if (!double.IsFinite(xMin) || !double.IsFinite(xMax) || !double.IsFinite(step))
+        {
+            ShowError("Границы и шаг должны быть конечными числами.");
+            return;
+        }
+
         if (xMin >= xMax)
         {
             ShowError("XMin должен быть меньше XMax");
@@ -42,18 +50,32 @@ public partial class MainWindow : Window
             return;
         }
 
-        List<DataPoint> points = [];
+        double estimatedPointCount = Math.Floor((xMax - xMin) / step) + 1;
+
+        if (!double.IsFinite(estimatedPointCount) || estimatedPointCount > MaxPointCount)
+        {
+            ShowError($"Слишком много точек для построения. Максимум: {MaxPointCount}. Увеличьте шаг.");
+            return;
+        }
+
+        int pointCount = (int)estimatedPointCount;
+
+        List<DataPoint> points = new(pointCount);
         Func<double, double> function;
 
         try
         {
             function = ExpressionParser.Compile(formula);
 
-            for (double x = xMin; x <= xMax; x += step)
+            for (int i = 0; i < pointCount; i++)
             {
+                double x = xMin + step * i;
+
+                if (x > xMax) break;
+
                 double y = function(x);
 
-                if (!double.IsNaN(y) && !double.IsInfinity(y))
+                if (double.IsFinite(y))
                 {
                     points.Add(new DataPoint(x, y));
                 }
