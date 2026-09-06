@@ -21,6 +21,24 @@ public partial class MainWindow : Window
 
     private void PlotButton_Click(object sender, RoutedEventArgs e)
     {
+        PlotGraph(saveToHistory: true);
+    }
+
+    private void HistoryDataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (HistoryDataGrid.SelectedItem is GraphRecord record)
+        {
+            FormulaTextBox.Text = record.Expression;
+            XMinTextBox.Text = record.XMin.ToString(CultureInfo.InvariantCulture);
+            XMaxTextBox.Text = record.XMax.ToString(CultureInfo.InvariantCulture);
+            StepTextBox.Text = record.Step.ToString(CultureInfo.InvariantCulture);
+
+            PlotGraph(saveToHistory: false);
+        }
+    }
+
+    private void PlotGraph(bool saveToHistory)
+    {
         string formula = FormulaTextBox.Text.Trim();
 
         if (string.IsNullOrEmpty(formula))
@@ -152,27 +170,17 @@ public partial class MainWindow : Window
             StatusTextBlock.Text = $"Готово. Точек: {validPointCount}. Площадь не вычислена: {ex.Message}";
         }
 
-        try
+        if (saveToHistory)
         {
-            HistoryRepository.AddRecord(formula, xMin, xMax, step, area);
-            LoadHistory();
-        }
-        catch (Exception ex)
-        {
-            ShowError($"Ошибка сохранения в базу данных: {ex.Message}");
-        }
-    }
-
-    private void HistoryDataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
-    {
-        if (HistoryDataGrid.SelectedItem is GraphRecord record)
-        {
-            FormulaTextBox.Text = record.Expression;
-            XMinTextBox.Text = record.XMin.ToString(CultureInfo.InvariantCulture);
-            XMaxTextBox.Text = record.XMax.ToString(CultureInfo.InvariantCulture);
-            StepTextBox.Text = record.Step.ToString(CultureInfo.InvariantCulture);
-
-            PlotButton_Click(sender, null);
+            try
+            {
+                HistoryRepository.AddRecord(formula, xMin, xMax, step, area);
+                LoadHistory();
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Ошибка сохранения в базу данных: {ex.Message}");
+            }
         }
     }
 
