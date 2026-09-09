@@ -37,6 +37,30 @@ public partial class MainWindow : Window
         }
     }
 
+    private static bool HasLikelyDiscontinuity(
+        Func<double, double> function,
+        double leftX,
+        double leftY,
+        double rightX,
+        double rightY)
+    {
+        bool changesSign = (leftY < 0 && rightY > 0) || (leftY > 0 && rightY < 0);
+
+        if (!changesSign)
+            return false;
+
+        double middleX = leftX + (rightX - leftX) / 2;
+        double middleY = function(middleX);
+
+        if (!double.IsFinite(middleY))
+            return true;
+
+        double minY = Math.Min(leftY, rightY);
+        double maxY = Math.Max(leftY, rightY);
+
+        return middleY < minY || middleY > maxY;
+    }
+
     private void PlotGraph(bool saveToHistory)
     {
         string formula = FormulaTextBox.Text.Trim();
@@ -81,6 +105,10 @@ public partial class MainWindow : Window
         List<DataPoint> points = new(pointCount);
         Func<double, double> function;
         int validPointCount = 0;
+        bool hasPreviousPoint = false;
+        bool hasDiscontinuity = false;
+        double previousX = 0;
+        double previousY = 0;
 
         try
         {
@@ -96,12 +124,24 @@ public partial class MainWindow : Window
 
                 if (double.IsFinite(y))
                 {
+                    if (hasPreviousPoint && HasLikelyDiscontinuity(function, previousX, previousY, x, y))
+                    {
+                        points.Add(DataPoint.Undefined);
+                        hasDiscontinuity = true;
+                    }
+
                     points.Add(new DataPoint(x, y));
                     validPointCount++;
+
+                    previousX = x;
+                    previousY = y;
+                    hasPreviousPoint = true;
                 }
                 else
                 {
                     points.Add(DataPoint.Undefined);
+                    hasPreviousPoint = false;
+                    hasDiscontinuity = true;
                 }
             }
         }
@@ -159,15 +199,24 @@ public partial class MainWindow : Window
         PlotView.Model = model;
 
         double? area = null;
-        try
+        if (hasDiscontinuity)
         {
-            int n = Math.Max(100, (int)((xMax - xMin) / step));
-            area = Integrator.Trapezoidal(function, xMin, xMax, n);
-            StatusTextBlock.Text = $"Готово. Точек: {validPointCount}. Площадь ≈ {area:F4}";
+            StatusTextBlock.Text =
+                $"Готово. Точек: {validPointCount}. " +
+                "Площадь не вычислена: обнаружен разрыв функции.";
         }
-        catch (InvalidOperationException ex)
+        else
         {
-            StatusTextBlock.Text = $"Готово. Точек: {validPointCount}. Площадь не вычислена: {ex.Message}";
+            try
+            {
+                int n = Math.Max(100, (int)((xMax - xMin) / step));
+                area = Integrator.Trapezoidal(function, xMin, xMax, n);
+                StatusTextBlock.Text = $"Готово. Точек: {validPointCount}. Площадь ≈ {area:F4}";
+            }
+            catch (InvalidOperationException ex)
+            {
+                StatusTextBlock.Text = $"Готово. Точек: {validPointCount}. Площадь не вычислена: {ex.Message}";
+            }
         }
 
         if (saveToHistory)
