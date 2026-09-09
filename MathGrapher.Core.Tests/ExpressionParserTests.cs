@@ -14,12 +14,23 @@ public class ExpressionParserTests
     [InlineData("x ^ 2", 3.0, 9.0)]
     [InlineData("sin(0)", 0.0, 0.0)]
     [InlineData("cos(0)", 0.0, 1.0)]
+    [InlineData("tan(pi / 4)", 0.0, 1.0)]
+    [InlineData("asin(1)", 0.0, Math.PI / 2)]
+    [InlineData("acos(0)", 0.0, Math.PI / 2)]
+    [InlineData("atan(1)", 0.0, Math.PI / 4)]
+    [InlineData("sinh(0)", 0.0, 0.0)]
+    [InlineData("cosh(0)", 0.0, 1.0)]
+    [InlineData("tanh(0)", 0.0, 0.0)]
     [InlineData("sqrt(9)", 0.0, 3.0)]
+    [InlineData("cbrt(-8)", 0.0, -2.0)]
     [InlineData("abs(-4)", 0.0, 4.0)]
+    [InlineData("ln(e)", 0.0, 1.0)]
     [InlineData("log(e)", 0.0, 1.0)]
+    [InlineData("log10(100)", 0.0, 2.0)]
     [InlineData("exp(0)", 0.0, 1.0)]
     [InlineData("pi", 0.0, Math.PI)]
     [InlineData("e", 0.0, Math.E)]
+    [InlineData("tau", 0.0, Math.Tau)]
     public void Evaluate_ValidExpression_ReturnsExpectedResult(string expression, double x, double expected)
     {
         double result = ExpressionParser.Evaluate(expression, x);

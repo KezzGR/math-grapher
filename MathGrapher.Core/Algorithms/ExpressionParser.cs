@@ -17,16 +17,27 @@ public static class ExpressionParser
     {
         { "sin", Math.Sin },
         { "cos", Math.Cos },
+        { "tan", Math.Tan },
+        { "asin", Math.Asin },
+        { "acos", Math.Acos },
+        { "atan", Math.Atan },
+        { "sinh", Math.Sinh },
+        { "cosh", Math.Cosh },
+        { "tanh", Math.Tanh },
         { "sqrt", Math.Sqrt },
+        { "cbrt", Math.Cbrt },
         { "abs", Math.Abs },
+        { "ln", Math.Log },
         { "log", Math.Log },
+        { "log10", Math.Log10 },
         { "exp", Math.Exp }
     };
 
     private static readonly Dictionary<string, double> Constants = new(StringComparer.OrdinalIgnoreCase)
     {
         { "pi", Math.PI },
-        { "e", Math.E }
+        { "e", Math.E },
+        { "tau", Math.Tau }
     };
 
     public static double Evaluate(string expression, double x)
@@ -99,7 +110,7 @@ public static class ExpressionParser
             {
                 string name = "";
 
-                while (i < expression.Length && char.IsLetter(expression[i]))
+                while (i < expression.Length && char.IsLetterOrDigit(expression[i]))
                 {
                     name += expression[i];
                     i++;
