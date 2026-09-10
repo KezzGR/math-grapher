@@ -6,11 +6,15 @@
         xmlns:local="clr-namespace:MathGrapher"
         xmlns:oxy="http://oxyplot.org/wpf"
         mc:Ignorable="d"
-        Title="Построитель графиков" Height="600" Width="800">
+        Title="Построитель графиков"
+        Height="700"
+        Width="1200"
+        MinHeight="550"
+        MinWidth="950">
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="480"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -18,35 +22,98 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,10">
-            <TextBlock Text="Формула:" VerticalAlignment="Center" Margin="0,0,5,0"/>
-            <TextBox x:Name="FormulaTextBox" Width="200" VerticalAlignment="Center" Margin="0,0,10,0" Text="sin(x)"/>
-            <TextBlock Text="X от:" VerticalAlignment="Center" Margin="0,0,5,0"/>
-            <TextBox x:Name="XMinTextBox" Width="60" VerticalAlignment="Center" Margin="0,0,10,0" Text="-10"/>
-            <TextBlock Text="до:" VerticalAlignment="Center" Margin="0,0,5,0"/>
-            <TextBox x:Name="XMaxTextBox" Width="60" VerticalAlignment="Center" Margin="0,0,10,0" Text="10"/>
-            <TextBlock Text="Шаг:" VerticalAlignment="Center" Margin="0,0,5,0"/>
-            <TextBox x:Name="StepTextBox" Width="60" VerticalAlignment="Center" Margin="0,0,10,0" Text="0.1"/>
-            <Button x:Name="PlotButton" Content="Построить" Width="80" Click="PlotButton_Click"/>
+        <StackPanel Grid.Row="0"
+                Grid.ColumnSpan="2"
+                Orientation="Horizontal"
+                Margin="0,0,0,10">
+            <TextBlock Text="Формула:"
+                    VerticalAlignment="Center"
+                    Margin="0,0,5,0"/>
+            <TextBox x:Name="FormulaTextBox"
+                    Width="200"
+                    VerticalAlignment="Center"
+                    Margin="0,0,10,0"
+                    Text="sin(x)"/>
+            <TextBlock Text="X от:"
+                    VerticalAlignment="Center"
+                    Margin="0,0,5,0"/>
+            <TextBox x:Name="XMinTextBox"
+                    Width="60"
+                    VerticalAlignment="Center"
+                    Margin="0,0,10,0"
+                    Text="-10"/>
+            <TextBlock Text="до:"
+                    VerticalAlignment="Center"
+                    Margin="0,0,5,0"/>
+            <TextBox x:Name="XMaxTextBox"
+                    Width="60"
+                    VerticalAlignment="Center"
+                    Margin="0,0,10,0"
+                    Text="10"/>
+            <TextBlock Text="Шаг:"
+                    VerticalAlignment="Center"
+                    Margin="0,0,5,0"/>
+            <TextBox x:Name="StepTextBox"
+                    Width="60"
+                    VerticalAlignment="Center"
+                    Margin="0,0,10,0"
+                    Text="0.1"/>
+            <Button x:Name="PlotButton"
+                    Content="Построить"
+                    Width="80"
+                    Click="PlotButton_Click"/>
         </StackPanel>
 
-        <oxy:PlotView x:Name="PlotView" Grid.Row="1" Grid.Column="0"/>
+        <oxy:PlotView x:Name="PlotView"
+                Grid.Row="1"
+                Grid.Column="0"/>
 
-        <Grid Grid.Row="1" Grid.Column="1">
+        <Grid Grid.Row="1"
+                Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Text="История построений:" FontWeight="Bold" Margin="0,0,0,5"/>
-            <DataGrid x:Name="HistoryDataGrid" Grid.Row="1" AutoGenerateColumns="True" IsReadOnly="True"
-                      CanUserAddRows="False" MouseDoubleClick="HistoryDataGrid_MouseDoubleClick" SelectionUnit="FullRow">
-                
+            <TextBlock Grid.Row="0"
+                    Text="История построений:"
+                    FontWeight="Bold"
+                    Margin="0,0,0,5"/>
+            <DataGrid x:Name="HistoryDataGrid"
+                    Grid.Row="1"
+                    AutoGenerateColumns="False"
+                    HeadersVisibility="Column"
+                    IsReadOnly="True"
+                    CanUserAddRows="False"
+                    MouseDoubleClick="HistoryDataGrid_MouseDoubleClick"
+                    SelectionUnit="FullRow">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Выражение"
+                            Binding="{Binding Expression}"
+                            Width="*"/>
+                    <DataGridTextColumn Header="X min"
+                            Binding="{Binding XMin, StringFormat={}{0:G5}}"
+                            Width="60"/>
+                    <DataGridTextColumn Header="X max"
+                            Binding="{Binding XMax, StringFormat={}{0:G5}}"
+                            Width="60"/>
+                    <DataGridTextColumn Header="Шаг"
+                            Binding="{Binding Step, StringFormat={}{0:G5}}"
+                            Width="60"/>
+                    <DataGridTextColumn Header="Интеграл"
+                            Binding="{Binding Integral, StringFormat={}{0:G6}}"
+                            Width="80"/>
+                    <DataGridTextColumn Header="Создано"
+                            Binding="{Binding CreatedAt, StringFormat={}{0:dd.MM.yyyy HH:mm}}"
+                            Width="125"/>
+                </DataGrid.Columns>
             </DataGrid>
         </Grid>
-        
-        <StatusBar Grid.Row="2" Grid.ColumnSpan="2">
+
+        <StatusBar Grid.Row="2"
+                Grid.ColumnSpan="2">
             <StatusBarItem>
-                <TextBlock x:Name="StatusTextBlock" Text="Готово"/>
+                <TextBlock x:Name="StatusTextBlock"
+                        Text="Готово"/>
             </StatusBarItem>
         </StatusBar>
     </Grid>
