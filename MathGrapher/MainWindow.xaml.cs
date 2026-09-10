@@ -250,7 +250,7 @@ public partial class MainWindow : Window
     {
         if (!double.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
         {
-            ShowError($"Неккоректное значение в поле '{fieldName}'. Введите число.");
+            ShowError($"Некорректное значение в поле '{fieldName}'. Введите число.");
             return false;
         }
 

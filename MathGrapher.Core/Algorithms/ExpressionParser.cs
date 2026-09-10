@@ -4,7 +4,7 @@ namespace MathGrapher.Core.Algorithms;
 
 public static class ExpressionParser
 {
-    private static readonly Dictionary<char, int> Precedance = new()
+    private static readonly Dictionary<char, int> Precedence = new()
     {
         { '+', 1 },
         { '-', 1 },
@@ -150,7 +150,7 @@ public static class ExpressionParser
                     output.Enqueue(operators.Pop());
                 }
             }
-            else if (Precedance.ContainsKey(c))
+            else if (Precedence.ContainsKey(c))
             {
                 int previousIndex = i - 1;
 
@@ -159,7 +159,7 @@ public static class ExpressionParser
                     previousIndex--;
                 }
 
-                if (c == '-' && (previousIndex < 0 || expression[previousIndex] == '(' || Precedance.ContainsKey(expression[previousIndex])))
+                if (c == '-' && (previousIndex < 0 || expression[previousIndex] == '(' || Precedence.ContainsKey(expression[previousIndex])))
                 {
                     output.Enqueue(Token.Number(-1.0));
                     operators.Push(Token.Operator('*'));
@@ -169,9 +169,9 @@ public static class ExpressionParser
                     while (operators.Count > 0 && operators.Peek().Type == TokenType.Operator)
                     {
                         char stackOp = (char)operators.Peek().Value!;
-                        if (Precedance.TryGetValue(stackOp, out int stackPrec))
+                        if (Precedence.TryGetValue(stackOp, out int stackPrec))
                         {
-                            int currPrec = Precedance[c];
+                            int currPrec = Precedence[c];
 
                             if ((c != '^' && stackPrec >= currPrec) || (c == '^' && stackPrec > currPrec))
                             {
