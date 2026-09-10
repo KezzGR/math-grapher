@@ -198,24 +198,24 @@ public partial class MainWindow : Window
         model.PlotAreaBorderThickness = new OxyThickness(0);
         PlotView.Model = model;
 
-        double? area = null;
+        double? integral = null;
         if (hasDiscontinuity)
         {
             StatusTextBlock.Text =
                 $"Готово. Точек: {validPointCount}. " +
-                "Площадь не вычислена: обнаружен разрыв функции.";
+                "Интеграл не вычислен: обнаружен разрыв функции.";
         }
         else
         {
             try
             {
                 int n = Math.Max(100, (int)((xMax - xMin) / step));
-                area = Integrator.Trapezoidal(function, xMin, xMax, n);
-                StatusTextBlock.Text = $"Готово. Точек: {validPointCount}. Площадь ≈ {area:F4}";
+                integral = Integrator.Trapezoidal(function, xMin, xMax, n);
+                StatusTextBlock.Text = $"Готово. Точек: {validPointCount}. Интеграл ≈ {integral:F4}";
             }
             catch (InvalidOperationException ex)
             {
-                StatusTextBlock.Text = $"Готово. Точек: {validPointCount}. Площадь не вычислена: {ex.Message}";
+                StatusTextBlock.Text = $"Готово. Точек: {validPointCount}. Интеграл не вычислен: {ex.Message}";
             }
         }
 
@@ -223,7 +223,7 @@ public partial class MainWindow : Window
         {
             try
             {
-                HistoryRepository.AddRecord(formula, xMin, xMax, step, area);
+                HistoryRepository.AddRecord(formula, xMin, xMax, step, integral);
                 LoadHistory();
             }
             catch (Exception ex)

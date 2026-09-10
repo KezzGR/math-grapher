@@ -48,6 +48,14 @@ public class IntegratorTests
         Assert.Contains("не определена", exception.Message);
     }
 
+    [Fact]
+    public void Trapezoidal_NegativeFunction_ReturnsNegativeIntegral()
+    {
+        double result = Integrator.Trapezoidal(_ => -1.0, 0.0, 2.0, 100);
+
+        Assert.Equal(-2.0, result, precision: 10);
+    }
+
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]

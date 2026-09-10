@@ -7,7 +7,7 @@
         public double XMin { get; set; }
         public double XMax { get; set; }
         public double Step { get; set; }
-        public double? Area { get; set; }
+        public double? Integral { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

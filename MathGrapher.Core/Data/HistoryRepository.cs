@@ -9,19 +9,19 @@ namespace MathGrapher.Core.Data
             double xMin,
             double xMax,
             double step,
-            double? area)
+            double? integral)
         {
             using var connection = DatabaseHelper.GetConnection();
             using var command = connection.CreateCommand();
             command.CommandText = """
                 INSERT INTO GraphHistory (Expression, XMin, XMax, Step, Area)
-                VALUES ($expression, $xMin, $xMax, $step, $area);
+                VALUES ($expression, $xMin, $xMax, $step, $integral);
                 """;
             command.Parameters.AddWithValue("$expression", expression);
             command.Parameters.AddWithValue("$xMin", xMin);
             command.Parameters.AddWithValue("$xMax", xMax);
             command.Parameters.AddWithValue("$step", step);
-            command.Parameters.AddWithValue("$area", (object?)area ?? DBNull.Value);
+            command.Parameters.AddWithValue("$integral", (object?)integral ?? DBNull.Value);
             command.ExecuteNonQuery();
         }
 
@@ -46,7 +46,7 @@ namespace MathGrapher.Core.Data
                     XMin = reader.GetDouble(2),
                     XMax = reader.GetDouble(3),
                     Step = reader.GetDouble(4),
-                    Area = reader.IsDBNull(5) ? null : reader.GetDouble(5),
+                    Integral = reader.IsDBNull(5) ? null : reader.GetDouble(5),
                     CreatedAt = reader.GetDateTime(6)
                 });
             }

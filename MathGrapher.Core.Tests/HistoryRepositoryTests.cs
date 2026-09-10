@@ -30,10 +30,10 @@ public class HistoryRepositoryTests : IDisposable
         Assert.Equal(-10.0, newest.XMin);
         Assert.Equal(10.0, newest.XMax);
         Assert.Equal(0.1, newest.Step);
-        Assert.Null(newest.Area);
+        Assert.Null(newest.Integral);
 
         Assert.Equal("x * x", oldest.Expression);
-        Assert.Equal(2.5, oldest.Area);
+        Assert.Equal(2.5, oldest.Integral);
 
         Assert.True(newest.Id > oldest.Id);
         Assert.NotEqual(default, newest.CreatedAt);
