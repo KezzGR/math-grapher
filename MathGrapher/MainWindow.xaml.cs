@@ -67,28 +67,28 @@ public partial class MainWindow : Window
 
         if (string.IsNullOrEmpty(formula))
         {
-            ShowError("Введите формулу.");
+            ShowError("Enter an expression.");
             return;
         }
 
-        if (!TryParseDouble(XMinTextBox.Text, out double xMin, "XMin")) return;
-        if (!TryParseDouble(XMaxTextBox.Text, out double xMax, "XMax")) return;
-        if (!TryParseDouble(StepTextBox.Text, out double step, "Шаг")) return;
+        if (!TryParseDouble(XMinTextBox.Text, out double xMin, "X min")) return;
+        if (!TryParseDouble(XMaxTextBox.Text, out double xMax, "X max")) return;
+        if (!TryParseDouble(StepTextBox.Text, out double step, "Step")) return;
 
         if (!double.IsFinite(xMin) || !double.IsFinite(xMax) || !double.IsFinite(step))
         {
-            ShowError("Границы и шаг должны быть конечными числами.");
+            ShowError("Bounds and step must be finite numbers.");
             return;
         }
 
         if (xMin >= xMax)
         {
-            ShowError("XMin должен быть меньше XMax");
+            ShowError("X minimum must be less than X maximum.");
             return;
         }
         if (step <= 0)
         {
-            ShowError("Шаг должен быть положительным");
+            ShowError("Step must be positive.");
             return;
         }
 
@@ -96,7 +96,7 @@ public partial class MainWindow : Window
 
         if (!double.IsFinite(estimatedPointCount) || estimatedPointCount > MaxPointCount)
         {
-            ShowError($"Слишком много точек для построения. Максимум: {MaxPointCount}. Увеличьте шаг.");
+            ShowError($"Too many points to plot. Maximum: {MaxPointCount}. Increase the step.");
             return;
         }
 
@@ -153,7 +153,7 @@ public partial class MainWindow : Window
 
         if (validPointCount == 0)
         {
-            ShowError("Нет допустимых точек для построения графика.\nВозможно, функция не определена на всем интервале.");
+            ShowError("No valid points to plot.\nThe function may be undefined over the selected interval.");
             return;
         }
 
@@ -202,8 +202,8 @@ public partial class MainWindow : Window
         if (hasDiscontinuity)
         {
             StatusTextBlock.Text =
-                $"Готово. Точек: {validPointCount}. " +
-                "Интеграл не вычислен: обнаружен разрыв функции.";
+                $"Ready. Points: {validPointCount}. " +
+                "Integral unavailable: discontinuity detected.";
         }
         else
         {
@@ -211,11 +211,11 @@ public partial class MainWindow : Window
             {
                 int n = Math.Max(100, (int)((xMax - xMin) / step));
                 integral = Integrator.Trapezoidal(function, xMin, xMax, n);
-                StatusTextBlock.Text = $"Готово. Точек: {validPointCount}. Интеграл ≈ {integral:F4}";
+                StatusTextBlock.Text = $"Ready. Points: {validPointCount}. Integral ≈ {integral:F4}";
             }
             catch (InvalidOperationException ex)
             {
-                StatusTextBlock.Text = $"Готово. Точек: {validPointCount}. Интеграл не вычислен: {ex.Message}";
+                StatusTextBlock.Text = $"Ready. Points: {validPointCount}. Integral unavailable: {ex.Message}";
             }
         }
 
@@ -228,7 +228,7 @@ public partial class MainWindow : Window
             }
             catch (Exception ex)
             {
-                ShowError($"Ошибка сохранения в базу данных: {ex.Message}");
+                ShowError($"Failed to save graph history: {ex.Message}");
             }
         }
     }
@@ -242,7 +242,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            ShowError($"Не удалось загрузить историю: {ex.Message}");
+            ShowError($"Failed to load graph history: {ex.Message}");
         }
     }
 
@@ -250,7 +250,7 @@ public partial class MainWindow : Window
     {
         if (!double.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
         {
-            ShowError($"Некорректное значение в поле '{fieldName}'. Введите число.");
+            ShowError($"Invalid value in the '{fieldName}' field. Enter a number.");
             return false;
         }
 
@@ -259,7 +259,7 @@ public partial class MainWindow : Window
 
     private void ShowError(string message)
     {
-        MessageBox.Show(message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-        StatusTextBlock.Text = "Ошибка";
+        MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        StatusTextBlock.Text = "Error";
     }
 }

@@ -21,8 +21,8 @@ namespace MathGrapher
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Не удалось инициализировать историю графиков.\n\n{ex.Message}",
-                    "Ошибка запуска", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Failed to initialize graph history.\n\n{ex.Message}",
+                    "Startup error", MessageBoxButton.OK, MessageBoxImage.Error);
 
                 Shutdown(-1);
                 return;

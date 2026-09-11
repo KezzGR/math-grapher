@@ -50,7 +50,7 @@ public class ExpressionParserTests
         ArgumentException exception = Assert.Throws<ArgumentException>(
             () => ExpressionParser.Evaluate(expression, 0.0));
 
-        Assert.Contains("Некорректное выражение", exception.Message);
+        Assert.Contains("Invalid expression", exception.Message);
     }
 
     [Fact]

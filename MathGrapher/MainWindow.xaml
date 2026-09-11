@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:MathGrapher"
         xmlns:oxy="http://oxyplot.org/wpf"
         mc:Ignorable="d"
-        Title="Построитель графиков"
+        Title="MathGrapher"
         Height="700"
         Width="1200"
         MinHeight="550"
@@ -26,7 +26,7 @@
                 Grid.ColumnSpan="2"
                 Orientation="Horizontal"
                 Margin="0,0,0,10">
-            <TextBlock Text="Формула:"
+            <TextBlock Text="Expression:"
                     VerticalAlignment="Center"
                     Margin="0,0,5,0"/>
             <TextBox x:Name="FormulaTextBox"
@@ -34,7 +34,7 @@
                     VerticalAlignment="Center"
                     Margin="0,0,10,0"
                     Text="sin(x)"/>
-            <TextBlock Text="X от:"
+            <TextBlock Text="X from:"
                     VerticalAlignment="Center"
                     Margin="0,0,5,0"/>
             <TextBox x:Name="XMinTextBox"
@@ -42,7 +42,7 @@
                     VerticalAlignment="Center"
                     Margin="0,0,10,0"
                     Text="-10"/>
-            <TextBlock Text="до:"
+            <TextBlock Text="to:"
                     VerticalAlignment="Center"
                     Margin="0,0,5,0"/>
             <TextBox x:Name="XMaxTextBox"
@@ -50,7 +50,7 @@
                     VerticalAlignment="Center"
                     Margin="0,0,10,0"
                     Text="10"/>
-            <TextBlock Text="Шаг:"
+            <TextBlock Text="Step:"
                     VerticalAlignment="Center"
                     Margin="0,0,5,0"/>
             <TextBox x:Name="StepTextBox"
@@ -59,7 +59,7 @@
                     Margin="0,0,10,0"
                     Text="0.1"/>
             <Button x:Name="PlotButton"
-                    Content="Построить"
+                    Content="Plot"
                     Width="80"
                     Click="PlotButton_Click"/>
         </StackPanel>
@@ -75,7 +75,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0"
-                    Text="История построений:"
+                    Text="Plot history:"
                     FontWeight="Bold"
                     Margin="0,0,0,5"/>
             <DataGrid x:Name="HistoryDataGrid"
@@ -87,7 +87,7 @@
                     MouseDoubleClick="HistoryDataGrid_MouseDoubleClick"
                     SelectionUnit="FullRow">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Выражение"
+                    <DataGridTextColumn Header="Expression"
                             Binding="{Binding Expression}"
                             Width="*"/>
                     <DataGridTextColumn Header="X min"
@@ -96,14 +96,14 @@
                     <DataGridTextColumn Header="X max"
                             Binding="{Binding XMax, StringFormat={}{0:G5}}"
                             Width="60"/>
-                    <DataGridTextColumn Header="Шаг"
+                    <DataGridTextColumn Header="Step"
                             Binding="{Binding Step, StringFormat={}{0:G5}}"
                             Width="60"/>
-                    <DataGridTextColumn Header="Интеграл"
+                    <DataGridTextColumn Header="Integral"
                             Binding="{Binding Integral, StringFormat={}{0:G6}}"
                             Width="80"/>
-                    <DataGridTextColumn Header="Создано"
-                            Binding="{Binding CreatedAt, StringFormat={}{0:dd.MM.yyyy HH:mm}}"
+                    <DataGridTextColumn Header="Created"
+                            Binding="{Binding CreatedAt, StringFormat={}{0:yyyy-MM-dd HH:mm}}"
                             Width="125"/>
                 </DataGrid.Columns>
             </DataGrid>
@@ -113,7 +113,7 @@
                 Grid.ColumnSpan="2">
             <StatusBarItem>
                 <TextBlock x:Name="StatusTextBlock"
-                        Text="Готово"/>
+                        Text="Ready"/>
             </StatusBarItem>
         </StatusBar>
     </Grid>

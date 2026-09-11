@@ -57,7 +57,7 @@ public static class ExpressionParser
         }
         catch (Exception ex)
         {
-            throw new ArgumentException($"Некорректное выражение: {ex.Message}", nameof(expression), ex);
+            throw new ArgumentException($"Invalid expression: {ex.Message}", nameof(expression), ex);
         }
 
         return x =>
@@ -68,11 +68,11 @@ public static class ExpressionParser
             }
             catch (InvalidOperationException ex)
             {
-                throw new ArgumentException("Некорректное выражение: недостаточно операндов.", nameof(expression), ex);
+                throw new ArgumentException("Invalid expression: not enough operands.", nameof(expression), ex);
             }
             catch (Exception ex)
             {
-                throw new ArgumentException($"Некорректное выражение: {ex.Message}", nameof(expression), ex);
+                throw new ArgumentException($"Invalid expression: {ex.Message}", nameof(expression), ex);
             }
         };
     }
@@ -127,7 +127,7 @@ public static class ExpressionParser
                 }
                 else
                 {
-                    throw new Exception($"Неизвестное имя: {name}");
+                    throw new Exception($"Unknown identifier: {name}");
                 }
             }
             else if (c == '(')
@@ -141,7 +141,7 @@ public static class ExpressionParser
                     output.Enqueue(operators.Pop());
                 }
 
-                if (operators.Count == 0) throw new Exception("Несогласованные скобки");
+                if (operators.Count == 0) throw new Exception("Mismatched parentheses");
 
                 operators.Pop();
 
@@ -187,7 +187,7 @@ public static class ExpressionParser
             }
             else
             {
-                throw new Exception($"Недопустимый символ: '{c}'");
+                throw new Exception($"Invalid character: '{c}'");
             }
         }
 
@@ -195,7 +195,7 @@ public static class ExpressionParser
         {
             Token token = operators.Pop();
 
-            if (token.Type == TokenType.LeftParen) throw new Exception("Несогласованные скобки");
+            if (token.Type == TokenType.LeftParen) throw new Exception("Mismatched parentheses");
 
             output.Enqueue(token);
         }
@@ -230,7 +230,7 @@ public static class ExpressionParser
                         '*' => left * right,
                         '/' => left / right,
                         '^' => Math.Pow(left, right),
-                        _ => throw new Exception($"Неизвестный оператор: {op}")
+                        _ => throw new Exception($"Unknown operator: {op}")
                     };
 
                     stack.Push(result);
@@ -244,11 +244,11 @@ public static class ExpressionParser
                     break;
 
                 default:
-                    throw new Exception($"Неожиданный токен: {token.Type}");
+                    throw new Exception($"Unexpected token: {token.Type}");
             }
         }
 
-        if (stack.Count != 1) throw new Exception($"Ошибка вычисления: неверное число операндов");
+        if (stack.Count != 1) throw new Exception("Evaluation error: invalid number of operands");
 
         return stack.Pop();
     }

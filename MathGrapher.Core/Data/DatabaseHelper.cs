@@ -34,7 +34,7 @@ namespace MathGrapher.Core.Data
             if (string.IsNullOrEmpty(_connectionString))
             {
                 throw new InvalidOperationException(
-                    "Строка подключения не установлена. Вызовите Initialize.");
+                    "Connection string is not configured. Call Initialize first.");
             }
 
             var connection = new SqliteConnection(_connectionString);

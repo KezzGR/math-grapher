@@ -36,7 +36,7 @@ public class IntegratorTests
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(
             () => Integrator.Trapezoidal(x => Math.Sqrt(x), -10.0, 10.0, 100));
 
-        Assert.Contains("не определена", exception.Message);
+        Assert.Contains("not finite", exception.Message);
     }
 
     [Fact]
@@ -45,7 +45,7 @@ public class IntegratorTests
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(
             () => Integrator.Trapezoidal(x => 1 / x, -1.0, 1.0, 100));
 
-        Assert.Contains("не определена", exception.Message);
+        Assert.Contains("not finite", exception.Message);
     }
 
     [Fact]
