@@ -1,5 +1,7 @@
 # MathGrapher
 
+[![CI](https://github.com/KezzGR/math-grapher/actions/workflows/ci.yml/badge.svg)](https://github.com/KezzGR/math-grapher/actions/workflows/ci.yml)
+
 MathGrapher is a small Windows desktop application that parses mathematical expressions, plots functions, estimates definite integrals, and stores graph history locally.
 
 ![MathGrapher screenshot](docs/images/mathgrapher.png)
