@@ -157,7 +157,11 @@ public partial class MainWindow : Window
             return;
         }
 
-        PlotModel model = new() { Title = $"y = {formula}" };
+        PlotModel model = new()
+        {
+            Title = $"y = {formula}",
+            Culture = CultureInfo.InvariantCulture
+        };
 
         LineSeries lineSeries = new()
         {
@@ -211,7 +215,7 @@ public partial class MainWindow : Window
             {
                 int n = Math.Max(100, (int)((xMax - xMin) / step));
                 integral = Integrator.Trapezoidal(function, xMin, xMax, n);
-                StatusTextBlock.Text = $"Ready. Points: {validPointCount}. Integral ≈ {integral:F4}";
+                StatusTextBlock.Text = $"Ready. Points: {validPointCount}. Integral ≈ {integral.Value.ToString("F4", CultureInfo.InvariantCulture)}";
             }
             catch (InvalidOperationException ex)
             {
