@@ -6,6 +6,10 @@ MathGrapher is a small Windows desktop application that parses mathematical expr
 
 ![MathGrapher screenshot](docs/images/mathgrapher.png)
 
+## Download
+
+Download the ready-to-run Windows build from the [latest release](https://github.com/KezzGR/math-grapher/releases/latest). Extract the ZIP archive and run `MathGrapher.exe`. The .NET runtime is included.
+
 ## Features
 
 - Plot expressions over a configurable X range and sampling step.
